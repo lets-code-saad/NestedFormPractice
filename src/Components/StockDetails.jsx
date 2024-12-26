@@ -1,13 +1,29 @@
-import React from 'react'
-import { Controller } from 'react-hook-form'
+import React, { useState } from 'react'
+import { Controller, useForm  } from 'react-hook-form'
 import { Box, Card, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, OutlinedInput, Radio, RadioGroup, Switch, TextField } from '@mui/material'
-import ExpireyForm from './ExpireyForm';
 
 
 
 const StockDetails = (props) => {
-  const { control, formValuesData } = props;
-  console.log(formValuesData)
+  const { setValue } = useForm();
+
+  // Receiving Functions As Props
+  const { control, register, formValuesData, errors } = props;
+
+// Function to handle the status input
+const [status, setStatus] = useState("")
+const statusHandling = (event)=>{
+  setStatus(event.target.value)
+}
+
+  // Functions to handle switch button
+
+  const [inStock, setInStock] = useState(false)
+  const handleChangeValue = (event) => {
+    setInStock(event.target.checked)
+
+  }
+
   return (
     <>
       <Grid container spacing={4}>
@@ -15,85 +31,126 @@ const StockDetails = (props) => {
           <Card sx={{ padding: 2 }}>
             <FormGroup>
               <FormControlLabel
-                control={<Switch defaultValue={false} />} label="In Stock" color="danger" />
+                control={<Switch 
+                  onChange={handleChangeValue} 
+                  defaultValue={false} />} 
+                  label="In Stock" color="danger"
+              />
             </FormGroup>
-            <Box className="mt-3">
-              <h6>Product Code</h6>
-              <FormControl>
-                <OutlinedInput
-                  color='success'
-                  size='small'
-                  placeholder="Enter Product Title" />
-              </FormControl>
-            </Box>
-            <Box className="mt-3">
-              <h6>Product SKU</h6>
-              <FormControl>
-                <OutlinedInput
-                  color='success'
-                  size='small'
-                  placeholder="Enter Product Title" />
-              </FormControl>
-            </Box>
-            <Controller
-              name='activeOrUnactive'
-              control={control}
-              render={({ field }) => (
-                <FormControl className="mt-3">
-                  <FormLabel id="demo-row-radio-buttons-group-label">Status</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby="demo-row-radio-buttons-group-label"
-                    name="row-radio-buttons-group"
-                  >
-                    <FormControlLabel
-                      {...field}
-                      value="true"
-                      control={<Radio />}
-                      label="Active" />
-                    <FormControlLabel
-                      {...field}
-                      value="false"
-                      control={<Radio />}
-                      label="Disabled"
-                      color="success" />
-                  </RadioGroup>
-                </FormControl>
+            {inStock && (
+              <>
+                <Box className="mt-3">
+                  <h6>Product Code</h6>
+                  <Controller
+                      name="productCode"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl>
+                        <OutlinedInput
+                        {...field}
+                          color='success'
+                          size='small'
+                          placeholder="Enter Product Code"
+                      {...register('productCode', { required: { value: true, message: "This is a required field" } })}
+                          />
+                  {errors.productCode && <span className="text-danger">{errors.productCode.message}</span>}
+                      </FormControl>
+                      )}
+                    />
 
-              )}
-            >
-            </Controller>
+                </Box>
+                <Box className="mt-3">
+                  <h6>Product SKU</h6>
+                  <FormControl>
+                    <OutlinedInput
+                      color='success'
+                      size='small'
+                      placeholder="Enter Product Title"
+                      {...register("sku", { required: { value: true, message: "This Is A Required Field" } })}
+                    />
+                  {errors.sku && <span className='text-danger'>{errors.sku.message}</span>}
+                  </FormControl>
 
-            {/* Adding A Condition For Expire Product */}
-            {/*Using nested ternary operator to ensure that the
+                </Box>
+                <Controller
+                  name='activeOrUnactive'
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl className="mt-3">
+                      <FormLabel id="demo-row-radio-buttons-group-label">Status</FormLabel>
+                      <RadioGroup
+                        row
+                        aria-labelledby="demo-row-radio-buttons-group-label"
+                        name="row-radio-buttons-group"
+                        onChange={statusHandling}
+                        >
+                        <FormControlLabel
+                          {...field}
+                          value="true"
+                          control={<Radio />}
+                          label="Active"
+                          {...register("trueValue", { required: { value: true, message: "Please Select Any Option" } })}
+                        />
+                        <FormControlLabel
+                          {...field}
+                          value="false"
+                          control={<Radio />}
+                          label="Disabled"
+                          />
+                      </RadioGroup>
+                    </FormControl>
+
+                  )}
+                />
+
+                {/* Adding A Condition For Expire Product */}
+                {/*Using nested ternary operator to ensure that the
              value displays only when there is any box filled */}
 
 
-            {formValuesData?.activeOrUnactive ? (
-              formValuesData?.activeOrUnactive === "true" ? (
 
                 <Box>
-                  <Controller
-                    name="expire-information"
-                    control={control}
-                    render={({ field }) => (
-                      <FormControl>
-                        <OutlinedInput
-                          color='success'
-                          size='small'
-                          placeholder="Enter Expiry Date" />
-                      </FormControl>
-                    )}
-                  >
-                  </Controller>
+                  {status === "true" && (
+                    <Controller
+                      name="manifacture-information"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl>
+                          <OutlinedInput
+                            {...field}
+                            color="success"
+                            size="small"
+                            placeholder="Please Enter Manufacture Date"
+                          />
+                        </FormControl>
+                      )}
+                    />
+                  )}
                 </Box>
-              ) : (
-                <FormControl>
-                  <OutlinedInput color='success' size='small' placeholder="Please Enter Your Name" />
-                </FormControl>
-              )) : null}
 
+                <Box>
+                  {status === "false" && (
+                    <Controller
+                      name="expirey-information"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl>
+                          <OutlinedInput
+                            {...field}
+                            color="success"
+                            size="small"
+                            placeholder="Enter Expiry Date"
+                          />
+                        </FormControl>
+                      )}
+                    />
+                  )}
+                </Box>
+              </>
+            )}
           </Card>
+
+
           <Card className="mt-3" sx={{ padding: 2 }}>
             <h5>Product Price</h5>
             <Box className="mt-3">

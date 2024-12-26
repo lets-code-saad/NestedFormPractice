@@ -16,10 +16,7 @@ function App() {
     formState: { errors } } = useForm();
 
 
-  const [productValue, setProductValue] = useState({
-    category:"",
-    activeOrUnactive:""
-  })
+  const [productValue, setProductValue] = useState()
 
   const addProductsHandler = (data) => {
     console.log(data)
@@ -27,7 +24,6 @@ function App() {
   }
 
   const formValuesData = watch();
-  console.log(formValuesData)
 
   useEffect(() => {
     setValue('description', productValue)
@@ -133,7 +129,7 @@ function App() {
             </Grid>
 
             <Grid item md={4}>
-<StockDetails control={control} formValuesData={formValuesData} />  {/* Passing "control" As A Prop To Child stockDetails file */}
+<StockDetails control={control} formValuesData={formValuesData} register={register} errors={errors} />  {/* Passing "control","register","formValuesData" As A Prop To Child stockDetails file */}
             </Grid>
 
           </Grid>
